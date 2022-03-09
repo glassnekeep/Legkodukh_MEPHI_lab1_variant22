@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "RingInfo.h"
 
 typedef struct MatrixOperations {
@@ -26,4 +27,26 @@ typedef struct Matrix {
     void** array;
     //MatrixOperations* operations;
 } Matrix;
+
+Matrix* matrixSum(Matrix* matrix1, Matrix* matrix2);
+
+Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2);
+
+void transposition(Matrix* matrix);
+
+void addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int line);
+
+void addLinearCombinationOfColumns(Matrix* matrix, const double* coefficients, int column);
+
+Matrix* intInput(int m, int n, RingInfo* ringInfo);
+
+Matrix* doubleInput(int m, int n, RingInfo* ringInfo);
+
+Matrix* complexInput(int m, int n, RingInfo* ringInfo);
+
+void printIntMatrix(Matrix* matrix);
+
+void printfDoubleMatrix(Matrix* matrix);
+
+void printfComplexMatrix(Matrix* matrix);
 #endif //LEGKODUKH_MEPHI_LAB1_VARIANT22_MATRIX_H

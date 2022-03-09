@@ -3,7 +3,6 @@
 //
 
 #include "Matrix.h"
-#include <string.h>
 
 Matrix* matrixSum(Matrix* matrix1, Matrix* matrix2) {
     if (!ringInfoEquals(matrix1 -> ringInfo, matrix2 -> ringInfo)) {
@@ -121,6 +120,7 @@ void addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int
             }
         }
         memcpy(matrix -> array[line] + j * size, sum, size);
+        free(sum);
     }
 }
 
@@ -137,7 +137,17 @@ void addLinearCombinationOfColumns(Matrix* matrix, const double* coefficients, i
         return;
     }
     //TODO обработать ошибку когда количество коэффициентов не равно количество столбцов - 1
-    
+    for (int i = 0; i < m; i++) {
+        void* sum = malloc(size);
+        memcpy(sum, matrix -> array[i] + column * size, size);
+        for (int j =0; j < n; j++) {
+            if (j != column) {
+                sum = matrix -> ringInfo -> sum(sum, matrix -> ringInfo -> multiplyOnDouble(matrix -> array[i] + j * size, coefficients[j]));
+            }
+        }
+        memcpy(matrix -> array[i] + column * size, sum, size);
+        free(sum);
+    }
 }
 
 Matrix* intInput(int m, int n, RingInfo* ringInfo) {
@@ -166,6 +176,107 @@ Matrix* intInput(int m, int n, RingInfo* ringInfo) {
     matrix -> m = m;
     matrix -> n = n;
     matrix -> ringInfo = ringInfo;
-    matrix -> array = (void*)array;
+    matrix -> array = (void**) array;
+    return matrix;
+}
 
+Matrix* doubleInput(int m, int n, RingInfo* ringInfo) {
+    if (m < 0) {
+        printf("Number of lines is lower than 1!\n");
+        return NULL;
+    }
+    if (n < 0) {
+        printf("Number of columns is lower than 1!\n!");
+        return NULL;
+    }
+    if (ringInfo == NULL) {
+        printf("The data type is not defined!\n");
+        return NULL;
+    }
+    double** array = (double **)calloc(m, sizeof(double*));
+    for (int i = 0; i < m; i++) {
+        array[i] = (double *) calloc(n, ringInfo -> size);
+    }
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%lf", &array[i][j]);
+        }
+    }
+    Matrix* matrix = malloc(sizeof(Matrix));
+    matrix -> m = m;
+    matrix -> n = n;
+    matrix -> ringInfo = ringInfo;
+    matrix -> array = (void**) array;
+    return matrix;
+}
+
+Matrix* complexInput(int m, int n, RingInfo* ringInfo) {
+    if (m < 0) {
+        printf("Number of lines is lower than 1!\n");
+        return NULL;
+    }
+    if (n < 0) {
+        printf("Number of columns is lower than 1!\n!");
+        return NULL;
+    }
+    if (ringInfo == NULL) {
+        printf("The data type is not defined!\n");
+        return NULL;
+    }
+    ComplexNumber** array = (ComplexNumber**) calloc(m, sizeof(ComplexNumber*));
+    for (int i = 0; i < m; i++) {
+        array[i] = (ComplexNumber*) calloc(n, ringInfo -> size);
+    }
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            ComplexNumber new;
+            printf("Enter real part\n");
+            scanf("%lf", &(new.realPart));
+            printf("Enter imaginary part\n");
+            scanf("%lf", &(new.imaginaryPart));
+            array[i][j] = new;
+        }
+    }
+    Matrix* matrix = malloc(sizeof(Matrix));
+    matrix -> m = m;
+    matrix -> n = n;
+    matrix -> ringInfo = ringInfo;
+    matrix -> array = (void**) array;
+    return matrix;
+}
+
+void printIntMatrix(Matrix* matrix) {
+    int** array = (int**) matrix -> array;
+    int m = matrix -> m;
+    int n = matrix -> n;
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%-5d", array[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void printfDoubleMatrix(Matrix* matrix) {
+    double** array = (double**) matrix -> array;
+    int m = matrix -> m;
+    int n = matrix -> n;
+    for (int i = 0; i < m; i++) {
+        for (int j =0; j < n; j++) {
+            printf("%-5f", array[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void printfComplexMatrix(Matrix* matrix) {
+    ComplexNumber** array = (ComplexNumber**) matrix -> array;
+    int m = matrix -> m;
+    int n = matrix -> n;
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("%-5f + %f", array[i][j].realPart, array[i][j].imaginaryPart);
+        }
+        printf("\n");
+    }
 }
