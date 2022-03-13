@@ -245,7 +245,7 @@ Matrix* complexInput(int m, int n, RingInfo* ringInfo) {
     return matrix;
 }
 
-void printIntMatrix(Matrix* matrix) {
+/*void printIntMatrix(Matrix* matrix) {
     int** array = (int**) matrix -> array;
     int m = matrix -> m;
     int n = matrix -> n;
@@ -279,4 +279,87 @@ void printfComplexMatrix(Matrix* matrix) {
         }
         printf("\n");
     }
+}*/
+
+void printMatrix(Matrix* matrix, int dataType) {
+    if (dataType < 1 || dataType > 3) {
+        printf("ERROR! Data type flag error");
+        return;
+    }
+    int m = matrix -> m;
+    int n = matrix -> n;
+    void** array = matrix -> array;
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            switch (dataType) {
+                case 1:
+                    printf("%-5d", ((int**)array)[i][j]);
+                    break;
+                case 2:
+                    printf("%-5f", ((double**)array)[i][j]);
+                    break;
+                case 3:
+                    printf("%-5f + %f", ((ComplexNumber **)array)[i][j].realPart, ((ComplexNumber **)array)[i][j].imaginaryPart);
+                    break;
+                default:
+                    printf("ERROR! Data type flag error");
+                    break;
+            }
+        }
+    }
+}
+
+Matrix* inputMatrix(int m, int n, int dataType) {
+    if (dataType < 1 || dataType > 3) {
+        printf("ERROR! Data type flag error");
+        return NULL;
+    }
+    RingInfo* ringInfo = malloc(sizeof(RingInfo));
+    Matrix* result = malloc(sizeof(Matrix));
+    switch (dataType) {
+        case 1:
+            createIntRingInfo(ringInfo);
+            break;
+        case 2:
+            createDoubleRingInfo(ringInfo);
+            break;
+        case 3:
+            createComplexRingInfo(ringInfo);
+            break;
+        default:
+            break;
+    }
+    void** array = malloc(ringInfo -> size * m * n);
+    result -> ringInfo = ringInfo;
+    result -> m = m;
+    result -> n = n;
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            printf("Enter the value of element[%d][%d]", m, n);
+            switch (dataType) {
+                case 1:
+                    int newIntValue;
+                    scanf("%d", &newIntValue);
+                    ((int**) array)[i][j] = newIntValue;
+                    break;
+                case 2:
+                    double newDoubleValue;
+                    scanf("%lf", &newDoubleValue);
+                    ((double**) array)[i][j] = newDoubleValue;
+                    break;
+                case 3:
+                    double real;
+                    double imaginary;
+                    scanf("%lf", &real);
+                    scanf("%lf", &imaginary);
+                    ComplexNumber newComplex = {real, imaginary};
+                    ((ComplexNumber**) array)[i][j] = newComplex;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    result -> array = array;
+    return result;
 }

@@ -44,9 +44,14 @@ Matrix* doubleInput(int m, int n, RingInfo* ringInfo);
 
 Matrix* complexInput(int m, int n, RingInfo* ringInfo);
 
-void printIntMatrix(Matrix* matrix);
+/*void printIntMatrix(Matrix* matrix);
 
 void printfDoubleMatrix(Matrix* matrix);
 
-void printfComplexMatrix(Matrix* matrix);
+void printfComplexMatrix(Matrix* matrix);*/
+
+void printMatrix(Matrix* matrix, int dataType);
+
+Matrix* inputMatrix(int m, int n, int dataType);
+
 #endif //LEGKODUKH_MEPHI_LAB1_VARIANT22_MATRIX_H
