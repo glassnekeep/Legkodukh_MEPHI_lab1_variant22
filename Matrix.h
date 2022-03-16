@@ -34,7 +34,7 @@ Matrix* matrixSum(Matrix* matrix1, Matrix* matrix2);
 
 Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2);
 
-void transpose(Matrix* matrix);
+Matrix* transpose(Matrix* matrix);
 
 void addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int line);
 

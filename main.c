@@ -42,14 +42,14 @@ int main() {
     int m = 0;
     int n = 0;
     do {
-        printf("1. Form matrix\n2. Export matrix\n3. Operations\n4. Print tests\n5. Clear screen\n6. Exit");
+        printf("1. Form matrix\n2. Export matrix\n3. Operations\n4. Print tests\n5. Clear screen\n6. Exit\n");
         while (scanf("%d", &choice) != 1 || ((int) choice > 6) || (int) choice < 1) {
             printf("Error. Enter correct number\n");
             getchar();
         }
         switch (choice) {
             case 1:
-                printf("Enter data type, where:\n1 - integer\n2 - double\n3 - complex");
+                printf("Enter data type, where:\n1 - integer\n2 - double\n3 - complex\n");
                 while ((scanf("%d", &dataType) != 1) || ((int) dataType > 3) || (int) dataType < 1) {
                     printf("Error. Enter correct number");
                     getchar();
@@ -152,7 +152,7 @@ int main() {
                         freeMatrix(multiplyMatrix);
                         break;
                     case 3:
-                        transpose(matrix);
+                        matrix = transpose(matrix);
                         break;
                     case 4:
                         int line = 0;

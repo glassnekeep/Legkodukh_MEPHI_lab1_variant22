@@ -27,11 +27,13 @@ Matrix* matrixSum(Matrix* matrix1, Matrix* matrix2) {
     Matrix* result = malloc(sizeof(Matrix));
     void** array = calloc(m, sizeof(void*));
     for (int i = 0; i < m; i++) {
-        array[i] = calloc(n, size);
+        *((char**) array + i) = calloc(n, sizeof(matrix1 -> ringInfo -> size));
     }
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
-            memcpy(array[i] + j * size, matrix1 -> ringInfo -> sum(matrix1 -> array[i] + j * size, matrix2 -> array[i] + j * size), size);
+            //memcpy(array + j * size, matrix1 -> ringInfo -> sum(matrix1 -> array[i] + j * size, matrix2 -> array[i] + j * size), size);
+            //memcpy(*((char**) result + i) + j * size, matrix1 -> ringInfo -> sum(*((char **) matrix1 -> array + i) + j * size, *((char**) matrix2 -> array + i) + j * size), size);
+            memcpy(*((char**)array + i) + j * size, matrix1 -> ringInfo -> sum(*((char**)(matrix1 -> array) + i) + j * size, * ((char**)(matrix2 -> array) + i) + j * size), size);
         }
     }
     result -> m = m;
@@ -63,16 +65,16 @@ Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2) {
     result -> ringInfo = matrix1 -> ringInfo;
     void** array = calloc(m, sizeof(void*));
     for (int i = 0; i < m; i++) {
-        array[i] = calloc(n, size);
+        *((char**) array + i) = calloc(n, sizeof(matrix1 -> ringInfo -> size));
     }
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
             void *sum = malloc(size);
             sum = result -> ringInfo -> zero;
             for (int k = 0; k < m; k++) {
-                sum = result -> ringInfo -> sum (sum, result -> ringInfo -> multiply(matrix1 -> array[i] + k * size, matrix2 -> array[k] + j * size));
+                sum = result -> ringInfo -> sum (sum, result -> ringInfo -> multiply(*((char**)(matrix1 -> array) + i) + k * size, *((char**) (matrix2 -> array) + k) + j * size));
             }
-            memcpy(array[i] + j * size, sum, size);
+            memcpy(*((char**)array + i) + j * size, sum, size);
         }
     }
     freeMatrix(matrix1);
@@ -80,10 +82,10 @@ Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2) {
     return result;
 }
 //TODO првоерить корректность работы этой штуки
-void transpose(Matrix* matrix) {
+Matrix* transpose(Matrix* matrix) {
     if (matrix == NULL) {
         printf("Matrix not created yet!\n");
-        return;
+        return NULL;
     }
     Matrix* result = malloc(sizeof(Matrix));
     int m = matrix -> m;
@@ -94,20 +96,14 @@ void transpose(Matrix* matrix) {
     result -> ringInfo = matrix -> ringInfo;
     void** array = calloc(m, sizeof(void*));
     for (int i = 0; i < m; i++) {
-        array[i] = calloc(n, size);
+        *((char**) array + i) = calloc(n, sizeof(matrix -> ringInfo -> size));
     }
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
-            memcpy(array[j] + i * size, matrix -> array[i] + j * size, size);
+            memcpy(*((char**)array + j) + i * size, *((char**)(matrix -> array) + i) + j * size, size);
         }
     }
-    *matrix = *result;
-    for (int i = 0; i < m; i++) {
-        free(result -> array[i]);
-    }
-    free(result -> array);
-    free(result -> ringInfo);
-    free(result);
+    return result;
 }
 
 void addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int line) {
@@ -130,13 +126,13 @@ void addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int
     for (int j = 0; j < n; j++) {
         //void* sum = matrix -> ringInfo -> zero;
         void* sum = malloc(size);
-        memcpy(sum, matrix -> array[line] + j * size, size);
+        memcpy(sum, *((char**)(matrix -> array) + line) + j * size, size);
         for (int i = 0; i < m; i++) {
             if (i != line) {
-                sum = matrix -> ringInfo -> sum(sum, matrix -> ringInfo -> multiplyOnDouble(matrix -> array[i] + j * size, coefficients[i]));
+                sum = matrix -> ringInfo -> sum(sum, matrix -> ringInfo -> multiplyOnDouble(*((char**)(matrix -> array) + i) + j * size, coefficients[i]));
             }
         }
-        memcpy(matrix -> array[line] + j * size, sum, size);
+        memcpy(*((char**)(matrix -> array) + line) + j * size, sum, size);
         free(sum);
     }
 }
@@ -160,13 +156,13 @@ void addLinearCombinationOfColumns(Matrix* matrix, const double* coefficients, i
     //TODO обработать ошибку когда количество коэффициентов не равно количество столбцов - 1
     for (int i = 0; i < m; i++) {
         void* sum = malloc(size);
-        memcpy(sum, matrix -> array[i] + column * size, size);
+        memcpy(sum, *(char**)((matrix -> array) + i) + column * size, size);
         for (int j =0; j < n; j++) {
             if (j != column) {
-                sum = matrix -> ringInfo -> sum(sum, matrix -> ringInfo -> multiplyOnDouble(matrix -> array[i] + j * size, coefficients[j]));
+                sum = matrix -> ringInfo -> sum(sum, matrix -> ringInfo -> multiplyOnDouble(*((char**)(matrix -> array) + i) + j * size, coefficients[j]));
             }
         }
-        memcpy(matrix -> array[i] + column * size, sum, size);
+        memcpy(*((char**)(matrix -> array) + i) + column * size, sum, size);
         free(sum);
     }
 }
@@ -331,6 +327,7 @@ void printMatrix(Matrix* matrix, int dataType) {
                     break;
             }
         }
+        printf("\n");
     }
 }
 
@@ -362,13 +359,16 @@ Matrix* inputMatrix(int m, int n, int dataType) {
     RingInfo* ringInfo = malloc(sizeof(RingInfo));
     Matrix* result = malloc(sizeof(Matrix));
     createRingInfoBasedOnDataType(ringInfo, dataType);
-    void** array = malloc(ringInfo -> size * m * n);
+    void** array = calloc(m, sizeof(void*));
+    for (int i = 0; i < m; i++) {
+        *((char**) array + i) = calloc(n, sizeof(ringInfo -> size));
+    }
     result -> ringInfo = ringInfo;
     result -> m = m;
     result -> n = n;
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
-            printf("Enter the value of element[%d][%d]\n", m, n);
+            printf("Enter the value of element[%d][%d]\n", i, j);
             switch (dataType) {
                 case 1:
                     int newIntValue;
