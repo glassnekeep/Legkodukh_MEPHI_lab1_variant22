@@ -5,6 +5,10 @@
 #include "Matrix.h"
 
 Matrix* matrixSum(Matrix* matrix1, Matrix* matrix2) {
+    if (matrix1 == NULL || matrix2 == NULL) {
+        printf("One of matrices not created yet!\n");
+        return NULL;
+    }
     if (!ringInfoEquals(matrix1 -> ringInfo, matrix2 -> ringInfo)) {
         printf("Matrices have different data types!\n");
         return NULL;
@@ -32,12 +36,16 @@ Matrix* matrixSum(Matrix* matrix1, Matrix* matrix2) {
     }
     result -> m = m;
     result -> n = n;
-    result -> ringInfo == matrix1 -> ringInfo;
+    result -> ringInfo = matrix1 -> ringInfo;
     result -> array = array;
     return result;
 }
 
 Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2) {
+    if (matrix1 == NULL || matrix2 == NULL) {
+        printf("One of matrices not created yet!\n");
+        return NULL;
+    }
     if (!ringInfoEquals(matrix1 -> ringInfo, matrix2 -> ringInfo)) {
         printf("Matrices have different data types!\n");
         return NULL;
@@ -47,7 +55,7 @@ Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2) {
         return NULL;
     }
     int m = matrix1 -> m;
-    int n = matrix1 -> n;
+    int n = matrix2 -> n;
     size_t size = matrix1 -> ringInfo -> size;
     Matrix* result = malloc(sizeof(Matrix));
     result -> m = m;
@@ -67,11 +75,16 @@ Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2) {
             memcpy(array[i] + j * size, sum, size);
         }
     }
+    freeMatrix(matrix1);
     result -> array = array;
     return result;
 }
 //TODO првоерить корректность работы этой штуки
-void transposition(Matrix* matrix) {
+void transpose(Matrix* matrix) {
+    if (matrix == NULL) {
+        printf("Matrix not created yet!\n");
+        return;
+    }
     Matrix* result = malloc(sizeof(Matrix));
     int m = matrix -> m;
     int n = matrix -> n;
@@ -98,6 +111,10 @@ void transposition(Matrix* matrix) {
 }
 
 void addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int line) {
+    if (matrix == NULL) {
+        printf("Matrix not created yet!\n");
+        return;
+    }
     int m = matrix -> m;
     int n = matrix -> n;
     size_t size = matrix -> ringInfo -> size;
@@ -125,6 +142,10 @@ void addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int
 }
 
 void addLinearCombinationOfColumns(Matrix* matrix, const double* coefficients, int column) {
+    if (matrix == NULL) {
+        printf("Matrix not created yet!\n");
+        return;
+    }
     int m = matrix -> m;
     int n = matrix -> n;
     size_t size = matrix -> ringInfo -> size;
@@ -150,7 +171,7 @@ void addLinearCombinationOfColumns(Matrix* matrix, const double* coefficients, i
     }
 }
 
-Matrix* intInput(int m, int n, RingInfo* ringInfo) {
+/*Matrix* intInput(int m, int n, RingInfo* ringInfo) {
     if (m < 0) {
         printf("Number of lines is lower than 1!\n");
         return NULL;
@@ -243,7 +264,7 @@ Matrix* complexInput(int m, int n, RingInfo* ringInfo) {
     matrix -> ringInfo = ringInfo;
     matrix -> array = (void**) array;
     return matrix;
-}
+}*/
 
 /*void printIntMatrix(Matrix* matrix) {
     int** array = (int**) matrix -> array;
@@ -282,8 +303,12 @@ void printfComplexMatrix(Matrix* matrix) {
 }*/
 
 void printMatrix(Matrix* matrix, int dataType) {
+    if (matrix == NULL) {
+        printf("Matrix not created yet!\n");
+        return;
+    }
     if (dataType < 1 || dataType > 3) {
-        printf("ERROR! Data type flag error");
+        printf("ERROR! Data type flag error\n");
         return;
     }
     int m = matrix -> m;
@@ -302,20 +327,18 @@ void printMatrix(Matrix* matrix, int dataType) {
                     printf("%-5f + %f", ((ComplexNumber **)array)[i][j].realPart, ((ComplexNumber **)array)[i][j].imaginaryPart);
                     break;
                 default:
-                    printf("ERROR! Data type flag error");
+                    printf("ERROR! Data type flag error\n");
                     break;
             }
         }
     }
 }
 
-Matrix* inputMatrix(int m, int n, int dataType) {
+void createRingInfoBasedOnDataType(RingInfo* ringInfo, int dataType) {
     if (dataType < 1 || dataType > 3) {
-        printf("ERROR! Data type flag error");
-        return NULL;
+        printf("ERROR! Data type flag error\n");
+        return;
     }
-    RingInfo* ringInfo = malloc(sizeof(RingInfo));
-    Matrix* result = malloc(sizeof(Matrix));
     switch (dataType) {
         case 1:
             createIntRingInfo(ringInfo);
@@ -329,13 +352,23 @@ Matrix* inputMatrix(int m, int n, int dataType) {
         default:
             break;
     }
+}
+
+Matrix* inputMatrix(int m, int n, int dataType) {
+    if (dataType < 1 || dataType > 3) {
+        printf("ERROR! Data type flag error\n");
+        return NULL;
+    }
+    RingInfo* ringInfo = malloc(sizeof(RingInfo));
+    Matrix* result = malloc(sizeof(Matrix));
+    createRingInfoBasedOnDataType(ringInfo, dataType);
     void** array = malloc(ringInfo -> size * m * n);
     result -> ringInfo = ringInfo;
     result -> m = m;
     result -> n = n;
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
-            printf("Enter the value of element[%d][%d]", m, n);
+            printf("Enter the value of element[%d][%d]\n", m, n);
             switch (dataType) {
                 case 1:
                     int newIntValue;
@@ -362,4 +395,58 @@ Matrix* inputMatrix(int m, int n, int dataType) {
     }
     result -> array = array;
     return result;
+}
+
+//TODO можно реализовать работу с диапазоном возможных значений от пользователя
+Matrix* generateRandomMatrix(int dataType) {
+    srand(time(NULL));
+    int m = 1 + rand() % 20;
+    int n = 1 + rand() % 20;
+    if (dataType < 1 || dataType > 3) {
+        printf("ERROR! Data type flag error\n");
+        return NULL;
+    }
+    Matrix* matrix = malloc(sizeof(Matrix));
+    RingInfo* ringInfo = malloc(sizeof(RingInfo));
+    createRingInfoBasedOnDataType(ringInfo, dataType);
+    void** array = malloc(ringInfo -> size * m * n);
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            switch(dataType) {
+                case 1:
+                    ((int**) array)[i][j] = rand() % 100 * (int) pow(-1.0, (double) (rand() % 2 + 1));
+                    break;
+                case 2:
+                    ((double**) array)[i][j] = (double) (rand() % 100) * pow(-1.0, (double) (rand() % 2 + 1));
+                    break;
+                case 3:
+                    double real = rand() % 100 * pow(-1.0, (double) (rand() % 2 + 1));
+                    double imaginary = rand() % 100 * pow(-1.0, (double) (rand() % 2 + 1));
+                    ComplexNumber newValue = {real, imaginary};
+                    ((ComplexNumber**) array)[i][j] = newValue;
+                    break;
+                default:
+                    return NULL;
+            }
+        }
+    }
+    matrix -> ringInfo = ringInfo;
+    matrix -> m = m;
+    matrix -> n = n;
+    matrix -> array = array;
+    return matrix;
+}
+
+void freeMatrix(Matrix* matrix) {
+    if (matrix == NULL) {
+        return;
+    }
+    RingInfo* ringInfo = matrix -> ringInfo;
+    void** array = matrix -> array;
+    int m = matrix -> m;
+    for (int i = 0; i < m; i++) {
+        free(array[i]);
+    }
+    free(array);
+    free(ringInfo);
 }

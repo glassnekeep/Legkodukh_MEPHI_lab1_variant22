@@ -15,7 +15,7 @@ typedef struct RingInfo {
     void* (*sum) (const void*, const void*);
     void* (*opposite) (void*);
     void* (*multiply) (void*, void*);
-    void* (*multiplyOnDouble) (void*, double)
+    void* (*multiplyOnDouble) (void*, double);
 } RingInfo;
 
 typedef struct ComplexNumber {

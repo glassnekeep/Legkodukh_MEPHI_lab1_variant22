@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "RingInfo.h"
+#include <time.h>
+#include <math.h>
 
 typedef struct MatrixOperations {
     void* (*matrixSum) (void*, void*);
@@ -32,7 +34,7 @@ Matrix* matrixSum(Matrix* matrix1, Matrix* matrix2);
 
 Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2);
 
-void transposition(Matrix* matrix);
+void transpose(Matrix* matrix);
 
 void addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int line);
 
@@ -53,5 +55,9 @@ void printfComplexMatrix(Matrix* matrix);*/
 void printMatrix(Matrix* matrix, int dataType);
 
 Matrix* inputMatrix(int m, int n, int dataType);
+
+Matrix* generateRandomMatrix(int dataType);
+
+void freeMatrix(Matrix* matrix);
 
 #endif //LEGKODUKH_MEPHI_LAB1_VARIANT22_MATRIX_H

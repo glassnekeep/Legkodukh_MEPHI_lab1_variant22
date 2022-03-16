@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "Matrix.h"
+#include <time.h>
 
 /*<--------------ТЗ-------------->
  * Прямоугольная матрица
@@ -15,46 +16,66 @@ void clearScreen() {
     fflush(stdout);
 }
 
+double* inputLinearCoefficients(int number, int raw) {
+    double* array = malloc(sizeof(double) * number);
+    for (int i = 0; i < number; i++) {
+        int currentRaw = i;
+        if (i >= raw) {
+            currentRaw++;
+        }
+        printf("Enter coefficient for line %d\n", currentRaw);
+        double newValue = 0.0;
+        while (scanf("%lf", &newValue) != 1) {
+            printf("Wrong type, double required\n");
+            getchar();
+        }
+        array[i] = newValue;
+    }
+    return array;
+}
+
 int main() {
-    Matrix* matrix;
+    Matrix* matrix = NULL;
     RingInfo* ringInfo = malloc(sizeof(RingInfo));
-    int m = 0;
-    int n = 0;
     int choice = 0;
     int dataType = 0;
+    int m = 0;
+    int n = 0;
     do {
-        printf("1. Form matrix\n2. Export matrix\n3. Operations\n4. Clear screen\n5. Exit");
-        while (scanf("%d", &choice) != 1 || ((int) choice > 5) || (int) choice < 1) {
+        printf("1. Form matrix\n2. Export matrix\n3. Operations\n4. Print tests\n5. Clear screen\n6. Exit");
+        while (scanf("%d", &choice) != 1 || ((int) choice > 6) || (int) choice < 1) {
             printf("Error. Enter correct number\n");
             getchar();
         }
         switch (choice) {
-            int choice1 = 0;
             case 1:
                 printf("Enter data type, where:\n1 - integer\n2 - double\n3 - complex");
                 while ((scanf("%d", &dataType) != 1) || ((int) dataType > 3) || (int) dataType < 1) {
                     printf("Error. Enter correct number");
+                    getchar();
                 }
-                printf("1. Read from keyboard\n2. Read from binary file\n3. Random value\n");
-                while (scanf("%d", &choice1) != 1 || ((int) choice1 > 3) || (int) choice1 < 1) {
+                int choice1 = 0;
+                printf("1. Read from keyboard\n2. Random value\n");
+                while (scanf("%d", &choice1) != 1 || ((int) choice1 > 2) || (int) choice1 < 1) {
                     printf("Error. Enter correct number\n");
                     getchar();
                 }
+                //TODO тут надо разобраться с инпутами и когда мы вообще создаем матрицу
                 switch (dataType) {
                     case 1:
                         createIntRingInfo(ringInfo);
-                        matrix = intInput(m, n, ringInfo);
                         break;
                     case 2:
                         createDoubleRingInfo(ringInfo);
-                        matrix = doubleInput(m, n, ringInfo);
                         break;
                     case 3:
                         createComplexRingInfo(ringInfo);
-                        matrix = complexInput(m, n, ringInfo);
                         break;
                     default:
                         break;
+                }
+                if (matrix != NULL) {
+                    freeMatrix(matrix);
                 }
                 switch (choice1) {
                     case 1:
@@ -68,51 +89,25 @@ int main() {
                             printf("Error. Enter correct number of columns\n");
                             getchar();
                         }
+                        matrix = inputMatrix(m, n, dataType);
                         break;
                     case 2:
-                        printf("");
-                        FILE *fl;
-                        char* file;
-                        scanf("%s", file);
-                        fl = fopen(file, "rb");
-                        if (fl) {
-                            fread(&m, sizeof(int), 1, fl);
-                            fread(&n, sizeof(int), 1, fl);
-                            printf("m = %d, n = %d\n", m, n);
-                            fread(string, sizeof(char) * 16, 1, fl);
-                            fclose(fl);
-                        } else {
-                            printf("This file does not exist\n");
-                        }
+                        matrix = generateRandomMatrix(dataType);
                         break;
-                    case 3:
-                        srand(time(NULL));
-                        n = 1 + rand() % 10;
-                        m = 1 + rand() % 10;
-                        int stringSize = rand() % 40;
-                        string = (char *) malloc(sizeof(char) * stringSize);
-                        for (int i = 0; i < stringSize; i++) {
-                            string[i] = (char) ('0' + rand() % 2);
-                        }
+                    default:
                         break;
                 }
-                matrix = (int **) calloc(m, sizeof(int *));
-                for (int i = 0; i < m; i++) {
-                    matrix[i] = (int *) calloc(n, sizeof(int));
-                }
-                matrix = makeMatrixWithKnownBinaryStringAndDimension(string, m, n);
-                //free(string);
                 break;
             case 2:
-                printf("1. Write matrix to console\n2. Write matrix to binary file\n");
+                /*printf("1. Write matrix to console\n2. Write matrix to binary file\n");
                 while (scanf("%d", &choice1) != 1 || ((int) choice1 > 2) || (int) choice1 < 1) {
                     printf("Error. Enter correct number\n");
                     getchar();
                 }
                 switch (choice1) {
-                    case 1:
-                        printMatrix(matrix, m, n);
-                        break;
+                    case 1:*/
+                        printMatrix(matrix, dataType);
+                        /*break;
                     case 2:
                         printf("");
                         char *file = readline("Enter filename\n");
@@ -128,70 +123,70 @@ int main() {
                         }
                         fclose(fl);
                         break;
-                }
+                }*/
                 break;
             case 3:
                 printf("");
                 int index;
-                printf("1. Insert a line by index\n2. Insert a column by index\n3. Delete a line by index\n4. Delete a column by index\n");
-                while (scanf("%d", &choice1) != 1 || ((int) choice1 > 4) || (int) choice1 < 1) {
+                printf("1. Sum two matrices\n2. Multiply two matrices\n3. Transpose the matrix\n4. Add linear combination of lines\n5. Add linear combination of columns\n");
+                while (scanf("%d", &choice1) != 1 || ((int) choice1 > 5) || (int) choice1 < 1) {
                     printf("Error. Enter correct number\n");
                     getchar();
                 }
-                printf("current matrix is %d x %d\n", m, n);
-                printf("Please enter the index\n");
+                printf("current matrix is %d x %d\n", matrix -> m, matrix -> n);
                 switch (choice1) {
                     case 1:
-                        while (scanf("%d", &index) != 1 || ((int) index >= m) || (int) index < 0) {
-                            printf("Error. Enter correct index\n");
-                            getchar();
-                        }
-                        int *line = calloc(n, sizeof(int));
-                        printf("Enter %d numbers\n", n);
-                        for (int i = 0; i < n; i++) {
-                            scanf("%d", &line[i]);
-                        }
-                        matrix = insertRawByIndex(matrix, line, index, m, n);
-                        m++;
+                        Matrix* sumMatrix = inputMatrix(matrix -> m, matrix -> n, dataType);
+                        matrix = matrixSum(matrix, sumMatrix);
+                        freeMatrix((sumMatrix));
                         break;
                     case 2:
-                        while (scanf("%d", &index) != 1 || ((int) index >= n) || (int) index < 0) {
-                            printf("Error. Enter correct index\n");
-                            getchar();
+                        //TODO разобраться с ограничениями на ввод
+                        int newMatrixNumberOfColumns;
+                        printf("Enter number of columns in the second matrix\n");
+                        while (scanf("%d", &newMatrixNumberOfColumns) != 1 || newMatrixNumberOfColumns < 1) {
+                            printf("Wrong number of columns. Enter it again\n");
                         }
-                        int *column = calloc(m, sizeof(int));
-                        printf("Enter %d numbers\n", m);
-                        for (int i = 0; i < m; i++) {
-                            scanf("%d", &column[i]);
-                        }
-                        matrix = insertColumnByIndex(matrix, column, index, m, n);
-                        n++;
+                        Matrix* multiplyMatrix = inputMatrix(matrix -> n, newMatrixNumberOfColumns, dataType);
+                        matrix = matrixMultiply(matrix, multiplyMatrix);
+                        freeMatrix(multiplyMatrix);
                         break;
                     case 3:
-                        while (scanf("%d", &index) != 1 || ((int) index >= m) || (int) index < 0) {
-                            printf("Error. Enter correct index\n");
-                            getchar();
-                        }
-                        matrix = deleterRawByIndex(matrix, index, m, n);
-                        m--;
+                        transpose(matrix);
                         break;
                     case 4:
-                        while (scanf("%d", &index) != 1 || ((int) index >= n) || (int) index < 0) {
-                            printf("Error. Enter correct index\n");
+                        int line = 0;
+                        while (scanf("%d", &line) != 1 || line < 0) {
+                            printf("Error. Enter correct number\n");
                             getchar();
                         }
-                        matrix = deleteColumnByIndex(matrix, index, m, n);
-                        n--;
+                        double* coefficients = inputLinearCoefficients(matrix -> m - 1, line);
+                        addLinearCombinationOfLines(matrix, coefficients, line);
+                        free(coefficients);
+                        break;
+                    case 5:
+                        int column = 0;
+                        while (scanf("%d", &column) != 1 || column < 0) {
+                            printf("Error. Enter correct column\n");
+                            getchar();
+                        }
+                        double* columnCoefficients = inputLinearCoefficients(matrix -> n - 1, column);
+                        addLinearCombinationOfColumns(matrix, columnCoefficients, column);
+                        free(columnCoefficients);
+                        break;
+                    default:
                         break;
                 }
                 break;
             case 4:
+                break;
+            case 5:
                 clearScreen();
                 break;
             default:
                 exit(0);
                 break;
         }
-    } while (choice != 4);
+    } while (choice != 5);
     return 0;
 }
