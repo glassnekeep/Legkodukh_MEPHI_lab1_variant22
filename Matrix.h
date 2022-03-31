@@ -54,10 +54,14 @@ void printfComplexMatrix(Matrix* matrix);*/
 
 void printMatrix(Matrix* matrix, int dataType);
 
+void printfMatrixToFile(Matrix* matrix, int dataType, FILE* filename);
+
 Matrix* inputMatrix(int m, int n, int dataType);
 
 Matrix* generateRandomMatrix(int dataType);
 
 void freeMatrix(Matrix* matrix);
+
+int matrixEquals(Matrix* matrix1, Matrix* matrix2);
 
 #endif //LEGKODUKH_MEPHI_LAB1_VARIANT22_MATRIX_H

@@ -57,6 +57,7 @@ Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2) {
         return NULL;
     }
     int m = matrix1 -> m;
+    int s = matrix1 -> n;
     int n = matrix2 -> n;
     size_t size = matrix1 -> ringInfo -> size;
     Matrix* result = malloc(sizeof(Matrix));
@@ -71,13 +72,13 @@ Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2) {
         for (int j = 0; j < n; j++) {
             void *sum = malloc(size);
             sum = result -> ringInfo -> zero;
-            for (int k = 0; k < m; k++) {
+            for (int k = 0; k < s; k++) {
                 sum = result -> ringInfo -> sum (sum, result -> ringInfo -> multiply(*((char**)(matrix1 -> array) + i) + k * size, *((char**) (matrix2 -> array) + k) + j * size));
             }
             memcpy(*((char**)array + i) + j * size, sum, size);
         }
     }
-    freeMatrix(matrix1);
+    //freeMatrix(matrix1);
     result -> array = array;
     return result;
 }
@@ -93,16 +94,18 @@ Matrix* transpose(Matrix* matrix) {
     size_t size = matrix -> ringInfo -> size;
     result -> m = n;
     result -> n = m;
+    result -> ringInfo = malloc(sizeof(RingInfo));
     result -> ringInfo = matrix -> ringInfo;
-    void** array = calloc(m, sizeof(void*));
-    for (int i = 0; i < m; i++) {
-        *((char**) array + i) = calloc(n, sizeof(matrix -> ringInfo -> size));
+    void** array = calloc(n, sizeof(void*));
+    for (int i = 0; i < n; i++) {
+        *((char**) array + i) = calloc(m, sizeof(matrix -> ringInfo -> size));
     }
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            memcpy(*((char**)array + j) + i * size, *((char**)(matrix -> array) + i) + j * size, size);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            memcpy(*((char**)array + i) + j * size, *((char**)(matrix -> array) + j) + i * size, size);
         }
     }
+    result -> array = array;
     return result;
 }
 
@@ -167,137 +170,6 @@ void addLinearCombinationOfColumns(Matrix* matrix, const double* coefficients, i
     }
 }
 
-/*Matrix* intInput(int m, int n, RingInfo* ringInfo) {
-    if (m < 0) {
-        printf("Number of lines is lower than 1!\n");
-        return NULL;
-    }
-    if (n < 0) {
-        printf("Number of columns is lower than 1!\n!");
-        return NULL;
-    }
-    if (ringInfo == NULL) {
-        printf("The data type is not defined!\n");
-        return NULL;
-    }
-    int** array = (int **)calloc(m, sizeof(int*));
-    for (int i = 0; i < m; i++) {
-        array[i] = (int *) calloc(n, ringInfo -> size);
-    }
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            scanf("%d", &array[i][j]);
-        }
-    }
-    Matrix* matrix = malloc(sizeof(Matrix));
-    matrix -> m = m;
-    matrix -> n = n;
-    matrix -> ringInfo = ringInfo;
-    matrix -> array = (void**) array;
-    return matrix;
-}
-
-Matrix* doubleInput(int m, int n, RingInfo* ringInfo) {
-    if (m < 0) {
-        printf("Number of lines is lower than 1!\n");
-        return NULL;
-    }
-    if (n < 0) {
-        printf("Number of columns is lower than 1!\n!");
-        return NULL;
-    }
-    if (ringInfo == NULL) {
-        printf("The data type is not defined!\n");
-        return NULL;
-    }
-    double** array = (double **)calloc(m, sizeof(double*));
-    for (int i = 0; i < m; i++) {
-        array[i] = (double *) calloc(n, ringInfo -> size);
-    }
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            scanf("%lf", &array[i][j]);
-        }
-    }
-    Matrix* matrix = malloc(sizeof(Matrix));
-    matrix -> m = m;
-    matrix -> n = n;
-    matrix -> ringInfo = ringInfo;
-    matrix -> array = (void**) array;
-    return matrix;
-}
-
-Matrix* complexInput(int m, int n, RingInfo* ringInfo) {
-    if (m < 0) {
-        printf("Number of lines is lower than 1!\n");
-        return NULL;
-    }
-    if (n < 0) {
-        printf("Number of columns is lower than 1!\n!");
-        return NULL;
-    }
-    if (ringInfo == NULL) {
-        printf("The data type is not defined!\n");
-        return NULL;
-    }
-    ComplexNumber** array = (ComplexNumber**) calloc(m, sizeof(ComplexNumber*));
-    for (int i = 0; i < m; i++) {
-        array[i] = (ComplexNumber*) calloc(n, ringInfo -> size);
-    }
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            ComplexNumber new;
-            printf("Enter real part\n");
-            scanf("%lf", &(new.realPart));
-            printf("Enter imaginary part\n");
-            scanf("%lf", &(new.imaginaryPart));
-            array[i][j] = new;
-        }
-    }
-    Matrix* matrix = malloc(sizeof(Matrix));
-    matrix -> m = m;
-    matrix -> n = n;
-    matrix -> ringInfo = ringInfo;
-    matrix -> array = (void**) array;
-    return matrix;
-}*/
-
-/*void printIntMatrix(Matrix* matrix) {
-    int** array = (int**) matrix -> array;
-    int m = matrix -> m;
-    int n = matrix -> n;
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            printf("%-5d", array[i][j]);
-        }
-        printf("\n");
-    }
-}
-
-void printfDoubleMatrix(Matrix* matrix) {
-    double** array = (double**) matrix -> array;
-    int m = matrix -> m;
-    int n = matrix -> n;
-    for (int i = 0; i < m; i++) {
-        for (int j =0; j < n; j++) {
-            printf("%-5f", array[i][j]);
-        }
-        printf("\n");
-    }
-}
-
-void printfComplexMatrix(Matrix* matrix) {
-    ComplexNumber** array = (ComplexNumber**) matrix -> array;
-    int m = matrix -> m;
-    int n = matrix -> n;
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            printf("%-5f + %f", array[i][j].realPart, array[i][j].imaginaryPart);
-        }
-        printf("\n");
-    }
-}*/
-
 void printMatrix(Matrix* matrix, int dataType) {
     if (matrix == NULL) {
         printf("Matrix not created yet!\n");
@@ -310,6 +182,7 @@ void printMatrix(Matrix* matrix, int dataType) {
     int m = matrix -> m;
     int n = matrix -> n;
     void** array = matrix -> array;
+    printf("----------------------------------\n");
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
             switch (dataType) {
@@ -317,10 +190,10 @@ void printMatrix(Matrix* matrix, int dataType) {
                     printf("%-5d", ((int**)array)[i][j]);
                     break;
                 case 2:
-                    printf("%-5f", ((double**)array)[i][j]);
+                    printf("%-5.2f", ((double**)array)[i][j]);
                     break;
                 case 3:
-                    printf("%-5f + %f", ((ComplexNumber **)array)[i][j].realPart, ((ComplexNumber **)array)[i][j].imaginaryPart);
+                    printf("%.1f + %1.1fi   ", ((ComplexNumber **)array)[i][j].realPart, ((ComplexNumber **)array)[i][j].imaginaryPart);
                     break;
                 default:
                     printf("ERROR! Data type flag error\n");
@@ -329,6 +202,42 @@ void printMatrix(Matrix* matrix, int dataType) {
         }
         printf("\n");
     }
+    printf("----------------------------------\n");
+}
+
+void printfMatrixToFile(Matrix* matrix, int dataType, FILE* filename) {
+    if (matrix == NULL) {
+        fprintf(filename, "Matrix not created yet!\n");
+        return;
+    }
+    if (dataType < 1 || dataType > 3) {
+        fprintf(filename, "ERROR! Data type flag error\n");
+        return;
+    }
+    int m = matrix -> m;
+    int n = matrix -> n;
+    void** array = matrix -> array;
+    fprintf(filename, "----------------------------------\n");
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            switch (dataType) {
+                case 1:
+                    fprintf(filename,"%-5d", ((int**)array)[i][j]);
+                    break;
+                case 2:
+                    fprintf(filename,"%-5.2f", ((double**)array)[i][j]);
+                    break;
+                case 3:
+                    fprintf(filename, "%.1f + %1.1fi   ", ((ComplexNumber **)array)[i][j].realPart, ((ComplexNumber **)array)[i][j].imaginaryPart);
+                    break;
+                default:
+                    fprintf(filename, "ERROR! Data type flag error\n");
+                    break;
+            }
+        }
+        fprintf(filename, "\n");
+    }
+    fprintf(filename, "----------------------------------\n");
 }
 
 void createRingInfoBasedOnDataType(RingInfo* ringInfo, int dataType) {
@@ -383,7 +292,9 @@ Matrix* inputMatrix(int m, int n, int dataType) {
                 case 3:
                     double real;
                     double imaginary;
+                    printf("Enter the real part\n");
                     scanf("%lf", &real);
+                    printf("Enter the imaginary part\n");
                     scanf("%lf", &imaginary);
                     ComplexNumber newComplex = {real, imaginary};
                     ((ComplexNumber**) array)[i][j] = newComplex;
@@ -409,7 +320,10 @@ Matrix* generateRandomMatrix(int dataType) {
     Matrix* matrix = malloc(sizeof(Matrix));
     RingInfo* ringInfo = malloc(sizeof(RingInfo));
     createRingInfoBasedOnDataType(ringInfo, dataType);
-    void** array = malloc(ringInfo -> size * m * n);
+    void** array = calloc(m, sizeof(void*));
+    for (int i = 0; i < m; i++) {
+        *((char**) array + i) = calloc(n, sizeof(ringInfo -> size));
+    }
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
             switch(dataType) {
@@ -449,4 +363,23 @@ void freeMatrix(Matrix* matrix) {
     }
     free(array);
     free(ringInfo);
+    free(matrix);
+}
+
+int matrixEquals(Matrix* matrix1, Matrix* matrix2) {
+    int m = matrix1 -> m;
+    int n = matrix1 -> n;
+    size_t size = matrix1 -> ringInfo -> size;
+    if (matrix1 -> m == matrix2 -> m && matrix1 -> n == matrix2 -> n && ringInfoEquals(matrix1 -> ringInfo, matrix2 -> ringInfo)) {
+        int flag = 1;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (*((char**)(matrix1 -> array) + i) + j * size != *((char**)(matrix2 -> array) + i) + j * size) {
+                    flag = 0;
+                    return 0;
+                }
+            }
+        }
+    }
+    return 1;
 }
