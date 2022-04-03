@@ -7,5 +7,4 @@
 
 #include "Matrix.h"
 
-int testSum(Matrix* matrix1, Matrix* matrix2, Matrix* result);
 #endif //LEGKODUKH_MEPHI_LAB1_VARIANT22_TESTS_H

@@ -79,11 +79,11 @@ void testWithFile() {
     int n = 0;
     int line;
     int column;
-    FILE *testIntFile = fopen("C:/test.txt", "r");
+    FILE *testIntFile = fopen("D:/test.txt", "r");
     if (testIntFile == NULL) {
         printf("NULL file");
     }
-    testOutPutFile = fopen("C:/testOutput.txt", "w");
+    testOutPutFile = fopen("D:/testOutput.txt", "w");
     if (fscanf(testIntFile, "%d", &m) != 1) {
         printf("Handled an error!!!");
     }
