@@ -20,10 +20,13 @@ Matrix* createTestMatrix(RingInfo* ringInfo, int m, int n) {
     Matrix* matrix = malloc(sizeof(Matrix));
     size_t size = ringInfo -> size;
     matrix -> ringInfo = ringInfo;
+    matrix -> m = m;
+    matrix -> n = n;
     void** array = calloc(m, sizeof(void*));
     for (int i = 0; i < m; i++) {
-        *((char**) array + i) = calloc(n, sizeof(size));
+        *((int**) array + i) = calloc(n, size);
     }
+    matrix -> array = array;
     return matrix;
 }
 
@@ -174,11 +177,10 @@ Matrix* createTestMatrix(RingInfo* ringInfo, int m, int n) {
 
 
 void testWithFile() {
-    char* testIntFileName = "test.txt";
+    char* testIntFileName = malloc(sizeof(char) * 60);
     char* testDoubleFileName = "testDouble.txt";
     char* testComplexFileName = "testComplex.txt";
     char* testOutputFileName = "testOutput.txt";
-    FILE* testIntFile;
     FILE* testDoubleFile;
     FILE* testComplexFile;
     FILE* testOutPutFile;
@@ -189,13 +191,20 @@ void testWithFile() {
     createDoubleRingInfo(doubleRingInfo);
     createComplexRingInfo(complexRingInfo);
     int m;
-    int n;
+    int n = 0;
     int line;
     int column;
-    testIntFile = fopen("test.txt\0", "r");
-    testOutPutFile = fopen("testOutput.txt", "w");
-    fscanf(testIntFile, "%d", &m);
-    fscanf(testIntFile, "%d", &n);
+    FILE *testIntFile = fopen("C:/test.txt", "r");
+    if (testIntFile == NULL) {
+        printf("NULL file");
+    }
+    testOutPutFile = fopen("C:/testOutput.txt", "w");
+    if (fscanf(testIntFile, "%d", &m) != 1) {
+        printf("Handled an error!!!");
+    }
+    if (fscanf(testIntFile, "%d", &n) != 1) {
+        printf("Handled an error!!!");
+    }
     Matrix* matrix1 = createTestMatrix(intRingInfo, m, n);
     Matrix* matrix2 = createTestMatrix(intRingInfo, m, n);
     Matrix* matrix3 = createTestMatrix(intRingInfo, m, n);
@@ -203,27 +212,35 @@ void testWithFile() {
     Matrix* matrix5 = createTestMatrix(intRingInfo, m, n);
     Matrix* matrix6 = createTestMatrix(intRingInfo, m, n);
     Matrix* matrix7 = createTestMatrix(intRingInfo, m, n);
+    size_t size = matrix1 -> ringInfo -> size;
     int coefficientLineSize = m - 1;
     int coefficientColumnSize = n - 1;
     double* coefficientLineArray = calloc(coefficientLineSize, sizeof(double));
     double* coefficientColumnArray = calloc(coefficientColumnSize, sizeof(double));
     fscanf(testIntFile, "%d", &line);
-    fscanf(testIntFile, "%d", &column);
     for (int i = 0; i < coefficientLineSize; i++) {
         fscanf(testIntFile, "%lf", &coefficientLineArray[i]);
     }
+    fscanf(testIntFile, "%d", &column);
     for (int i = 0; i < coefficientColumnSize; i++) {
         fscanf(testIntFile, "%lf", &coefficientColumnArray[i]);
     }
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
-            fscanf(testIntFile, "%d", &((int**) matrix1 -> array)[i][j]);
-            fscanf(testIntFile, "%d", &((int**) matrix2 -> array)[i][j]);
-            fscanf(testIntFile, "%d", &((int**) matrix3-> array)[i][j]);
-            fscanf(testIntFile, "%d", &((int**) matrix4 -> array)[i][j]);
-            fscanf(testIntFile, "%d", &((int**) matrix5 -> array)[i][j]);
-            fscanf(testIntFile, "%d", &((int**) matrix6 -> array)[i][j]);
-            fscanf(testIntFile, "%d", &((int**) matrix7 -> array)[i][j]);
+            /*fscanf(testIntFile, "%d", *((int**)(matrix1 -> array) + i) + j * size);
+            fscanf(testIntFile, "%d", *((int**)(matrix2 -> array) + i) + j * size);
+            fscanf(testIntFile, "%d", *((int**)(matrix3 -> array) + i) + j * size);
+            fscanf(testIntFile, "%d", *((int**)(matrix4 -> array) + i) + j * size);
+            fscanf(testIntFile, "%d", *((int**)(matrix5 -> array) + i) + j * size);
+            fscanf(testIntFile, "%d", *((int**)(matrix6 -> array) + i) + j * size);
+            fscanf(testIntFile, "%d", *((int**)(matrix7 -> array) + i) + j * size);*/
+            fscanf(testIntFile, "%d", &((int**)(matrix1 -> array))[i][j]);
+            fscanf(testIntFile, "%d", &((int**)(matrix2 -> array))[i][j]);
+            fscanf(testIntFile, "%d", &((int**)(matrix3 -> array))[i][j]);
+            fscanf(testIntFile, "%d", &((int**)(matrix4 -> array))[i][j]);
+            fscanf(testIntFile, "%d", &((int**)(matrix5 -> array))[i][j]);
+            fscanf(testIntFile, "%d", &((int**)(matrix6 -> array))[i][j]);
+            fscanf(testIntFile, "%d", &((int**)(matrix7 -> array))[i][j]);
         }
     }
     Matrix* matrixSummed = matrixSum(matrix1, matrix2);

@@ -374,7 +374,13 @@ int matrixEquals(Matrix* matrix1, Matrix* matrix2) {
         int flag = 1;
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
-                if (*((char**)(matrix1 -> array) + i) + j * size != *((char**)(matrix2 -> array) + i) + j * size) {
+                int value1 = ((int**)matrix1 -> array)[i][j];
+                int value2 = ((int**)matrix2 -> array)[i][j];
+                /*if (*((int**)(matrix1 -> array) + i) + j * size != *((int**)(matrix2 -> array) + i) + j * size) {
+                    flag = 0;
+                    return 0;
+                }*/
+                if (value1 != value2) {
                     flag = 0;
                     return 0;
                 }
