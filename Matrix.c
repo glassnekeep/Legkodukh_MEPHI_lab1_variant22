@@ -4,35 +4,42 @@
 
 #include "Matrix.h"
 
-Matrix* matrixSum(Matrix* matrix1, Matrix* matrix2) {
+errorSafeReturnMatrix* matrixSum(Matrix* matrix1, Matrix* matrix2) {
+    errorSafeReturnMatrix* returnValue = malloc(sizeof(errorSafeReturnMatrix));
+    Matrix* result = malloc(sizeof(Matrix));
     if (matrix1 == NULL || matrix2 == NULL) {
-        printf("One of matrices not created yet!\n");
-        return NULL;
+        //printf("One of matrices not created yet!\n");
+        returnValue -> error = NULL_POINTER;
+        returnValue -> value = NULL;
+        return returnValue;
     }
     if (!ringInfoEquals(matrix1 -> ringInfo, matrix2 -> ringInfo)) {
-        printf("Matrices have different data types!\n");
-        return NULL;
+        //printf("Matrices have different data types!\n");
+        returnValue -> error = DIFFERENT_TYPES;
+        returnValue -> value = NULL;
+        return returnValue;
     }
     if (matrix1 -> m != matrix2 -> m) {
-        printf("Matrices have different number of lines!\n");
-        return NULL;
+        //printf("Matrices have different number of lines!\n");
+        returnValue -> error = DIFFERENT_NUMBER_OF_LINES;
+        returnValue -> value = NULL;
+        return returnValue;
     }
     if (matrix1 -> n != matrix2 -> n) {
-        printf("Matrices have different number of columns");
-        return NULL;
+        //printf("Matrices have different number of columns");
+        returnValue -> error = DIFFERENT_NUMBER_OF_COLUMNS;
+        returnValue -> value = NULL;
+        return returnValue;
     }
     int m = matrix1 -> m;
     int n = matrix1 -> n;
     size_t size = matrix1 -> ringInfo -> size;
-    Matrix* result = malloc(sizeof(Matrix));
     void** array = calloc(m, sizeof(void*));
     for (int i = 0; i < m; i++) {
         *((char**) array + i) = calloc(n, sizeof(matrix1 -> ringInfo -> size));
     }
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
-            //memcpy(array + j * size, matrix1 -> ringInfo -> sum(matrix1 -> array[i] + j * size, matrix2 -> array[i] + j * size), size);
-            //memcpy(*((char**) result + i) + j * size, matrix1 -> ringInfo -> sum(*((char **) matrix1 -> array + i) + j * size, *((char**) matrix2 -> array + i) + j * size), size);
             memcpy(*((char**)array + i) + j * size, matrix1 -> ringInfo -> sum(*((char**)(matrix1 -> array) + i) + j * size, * ((char**)(matrix2 -> array) + i) + j * size), size);
         }
     }
@@ -40,27 +47,36 @@ Matrix* matrixSum(Matrix* matrix1, Matrix* matrix2) {
     result -> n = n;
     result -> ringInfo = matrix1 -> ringInfo;
     result -> array = array;
-    return result;
+    returnValue -> value = result;
+    returnValue -> error = OK;
+    return returnValue;
 }
 
-Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2) {
+errorSafeReturnMatrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2) {
+    errorSafeReturnMatrix* returnValue = malloc(sizeof(errorSafeReturnMatrix));
+    Matrix* result = malloc(sizeof(Matrix));
     if (matrix1 == NULL || matrix2 == NULL) {
-        printf("One of matrices not created yet!\n");
-        return NULL;
+        //printf("One of matrices not created yet!\n");
+        returnValue -> error = NULL_POINTER;
+        returnValue -> value = NULL;
+        return returnValue;
     }
     if (!ringInfoEquals(matrix1 -> ringInfo, matrix2 -> ringInfo)) {
-        printf("Matrices have different data types!\n");
-        return NULL;
+        //printf("Matrices have different data types!\n");
+        returnValue -> error = DIFFERENT_TYPES;
+        returnValue -> value = NULL;
+        return returnValue;
     }
     if (matrix1 -> n != matrix2 -> m) {
-        printf("Multiplication is impossible, number of lines of first matrix is not equal to number 0f columns of second matrix!\n");
-        return NULL;
+        //printf("Multiplication is impossible, number of lines of first matrix is not equal to number 0f columns of second matrix!\n");
+        returnValue -> error = IMPOSSIBLE_MULTIPLICATION;
+        returnValue -> value = NULL;
+        return returnValue;
     }
     int m = matrix1 -> m;
     int s = matrix1 -> n;
     int n = matrix2 -> n;
     size_t size = matrix1 -> ringInfo -> size;
-    Matrix* result = malloc(sizeof(Matrix));
     result -> m = m;
     result -> n = n;
     result -> ringInfo = matrix1 -> ringInfo;
@@ -80,15 +96,20 @@ Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2) {
     }
     //freeMatrix(matrix1);
     result -> array = array;
-    return result;
+    returnValue -> value = result;
+    returnValue -> error = OK;
+    return returnValue;
 }
 //TODO првоерить корректность работы этой штуки
-Matrix* transpose(Matrix* matrix) {
-    if (matrix == NULL) {
-        printf("Matrix not created yet!\n");
-        return NULL;
-    }
+errorSafeReturnMatrix* transpose(Matrix* matrix) {
+    errorSafeReturnMatrix* returnValue = malloc(sizeof(errorSafeReturnMatrix));
     Matrix* result = malloc(sizeof(Matrix));
+    if (matrix == NULL) {
+        //printf("Matrix not created yet!\n");
+        returnValue -> value = NULL;
+        returnValue -> error = NULL_POINTER;
+        return returnValue;
+    }
     int m = matrix -> m;
     int n = matrix -> n;
     size_t size = matrix -> ringInfo -> size;
@@ -106,24 +127,32 @@ Matrix* transpose(Matrix* matrix) {
         }
     }
     result -> array = array;
-    return result;
+    returnValue -> value = result;
+    returnValue -> error = OK;
+    return returnValue;
 }
 
-void addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int line) {
+errorSafeReturnMatrix* addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int line) {
+    errorSafeReturnMatrix* returnValue = malloc(sizeof(errorSafeReturnMatrix));
+    returnValue -> value = malloc(sizeof(Matrix));
+    returnValue -> value = NULL;
     if (matrix == NULL) {
-        printf("Matrix not created yet!\n");
-        return;
+        //printf("Matrix not created yet!\n");
+        returnValue -> error = NULL_POINTER;
+        return returnValue;
     }
     int m = matrix -> m;
     int n = matrix -> n;
     size_t size = matrix -> ringInfo -> size;
     if (line >= m) {
-        printf("Line number in bigger than the number of lines in matrix!\n");
-        return;
+        //printf("Line number in bigger than the number of lines in matrix!\n");
+        returnValue -> error = BIG_NUMBER_LINE;
+        return returnValue;
     }
     if (line < 0) {
-        printf("Line number is less than 0!\n");
-        return;
+        //printf("Line number is less than 0!\n");
+        returnValue -> error = SMALL_NUMBER_LINE;
+        return returnValue;
     }
     //TODO обработать ошибку когда количество коэффициентов не равно количество строк - 1
     for (int j = 0; j < n; j++) {
@@ -138,23 +167,31 @@ void addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int
         memcpy(*((char**)(matrix -> array) + line) + j * size, sum, size);
         free(sum);
     }
+    returnValue -> error = OK;
+    return returnValue;
 }
 
-void addLinearCombinationOfColumns(Matrix* matrix, const double* coefficients, int column) {
+errorSafeReturnMatrix* addLinearCombinationOfColumns(Matrix* matrix, const double* coefficients, int column) {
+    errorSafeReturnMatrix* returnValue = malloc(sizeof(errorSafeReturnMatrix));
+    returnValue -> value = malloc(sizeof(Matrix));
+    returnValue -> value = NULL;
     if (matrix == NULL) {
-        printf("Matrix not created yet!\n");
-        return;
+        //printf("Matrix not created yet!\n");
+        returnValue -> error = NULL_POINTER;
+        return returnValue;
     }
     int m = matrix -> m;
     int n = matrix -> n;
     size_t size = matrix -> ringInfo -> size;
     if (column >= n) {
-        printf("Column number is bigger that the number of columns in matrix!\n");
-        return;
+        //printf("Column number is bigger that the number of columns in matrix!\n");
+        returnValue -> error = BIG_NUMBER_COLUMN;
+        return returnValue;
     }
     if (column < 0) {
-        printf("Column number is lower that 0");
-        return;
+        //printf("Column number is lower that 0");
+        returnValue -> error = SMALL_NUMBER_COLUMN;
+        return returnValue;
     }
     //TODO обработать ошибку когда количество коэффициентов не равно количество столбцов - 1
     for (int i = 0; i < m; i++) {
@@ -308,49 +345,6 @@ Matrix* inputMatrix(int m, int n, int dataType) {
     return result;
 }
 
-//TODO можно реализовать работу с диапазоном возможных значений от пользователя
-Matrix* generateRandomMatrix(int dataType) {
-    srand(time(NULL));
-    int m = 1 + rand() % 20;
-    int n = 1 + rand() % 20;
-    if (dataType < 1 || dataType > 3) {
-        printf("ERROR! Data type flag error\n");
-        return NULL;
-    }
-    Matrix* matrix = malloc(sizeof(Matrix));
-    RingInfo* ringInfo = malloc(sizeof(RingInfo));
-    createRingInfoBasedOnDataType(ringInfo, dataType);
-    void** array = calloc(m, sizeof(void*));
-    for (int i = 0; i < m; i++) {
-        *((char**) array + i) = calloc(n, sizeof(ringInfo -> size));
-    }
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            switch(dataType) {
-                case 1:
-                    ((int**) array)[i][j] = rand() % 100 * (int) pow(-1.0, (double) (rand() % 2 + 1));
-                    break;
-                case 2:
-                    ((double**) array)[i][j] = (double) (rand() % 100) * pow(-1.0, (double) (rand() % 2 + 1));
-                    break;
-                case 3:
-                    double real = rand() % 100 * pow(-1.0, (double) (rand() % 2 + 1));
-                    double imaginary = rand() % 100 * pow(-1.0, (double) (rand() % 2 + 1));
-                    ComplexNumber newValue = {real, imaginary};
-                    ((ComplexNumber**) array)[i][j] = newValue;
-                    break;
-                default:
-                    return NULL;
-            }
-        }
-    }
-    matrix -> ringInfo = ringInfo;
-    matrix -> m = m;
-    matrix -> n = n;
-    matrix -> array = array;
-    return matrix;
-}
-
 void freeMatrix(Matrix* matrix) {
     if (matrix == NULL) {
         return;
@@ -376,10 +370,6 @@ int matrixEquals(Matrix* matrix1, Matrix* matrix2) {
             for (int j = 0; j < n; j++) {
                 int value1 = ((int**)matrix1 -> array)[i][j];
                 int value2 = ((int**)matrix2 -> array)[i][j];
-                /*if (*((int**)(matrix1 -> array) + i) + j * size != *((int**)(matrix2 -> array) + i) + j * size) {
-                    flag = 0;
-                    return 0;
-                }*/
                 if (value1 != value2) {
                     flag = 0;
                     return 0;

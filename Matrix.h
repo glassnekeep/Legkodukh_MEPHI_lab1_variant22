@@ -30,35 +30,39 @@ typedef struct Matrix {
     //MatrixOperations* operations;
 } Matrix;
 
-Matrix* matrixSum(Matrix* matrix1, Matrix* matrix2);
+typedef enum Errors {
+    OK,
+    NULL_POINTER,
+    DIFFERENT_TYPES,
+    DIFFERENT_NUMBER_OF_LINES,
+    DIFFERENT_NUMBER_OF_COLUMNS,
+    IMPOSSIBLE_MULTIPLICATION,
+    SMALL_NUMBER_LINE,
+    BIG_NUMBER_LINE,
+    SMALL_NUMBER_COLUMN,
+    BIG_NUMBER_COLUMN
+} Errors;
 
-Matrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2);
+typedef struct errorSafeReturnMatrix {
+    Matrix* value;
+    Errors error;
+} errorSafeReturnMatrix;
 
-Matrix* transpose(Matrix* matrix);
+errorSafeReturnMatrix* matrixSum(Matrix* matrix1, Matrix* matrix2);
 
-void addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int line);
+errorSafeReturnMatrix* matrixMultiply(Matrix* matrix1, Matrix* matrix2);
 
-void addLinearCombinationOfColumns(Matrix* matrix, const double* coefficients, int column);
+errorSafeReturnMatrix* transpose(Matrix* matrix);
 
-Matrix* intInput(int m, int n, RingInfo* ringInfo);
+errorSafeReturnMatrix* addLinearCombinationOfLines(Matrix* matrix, const double* coefficients, int line);
 
-Matrix* doubleInput(int m, int n, RingInfo* ringInfo);
-
-Matrix* complexInput(int m, int n, RingInfo* ringInfo);
-
-/*void printIntMatrix(Matrix* matrix);
-
-void printfDoubleMatrix(Matrix* matrix);
-
-void printfComplexMatrix(Matrix* matrix);*/
+errorSafeReturnMatrix*  addLinearCombinationOfColumns(Matrix* matrix, const double* coefficients, int column);
 
 void printMatrix(Matrix* matrix, int dataType);
 
 void printfMatrixToFile(Matrix* matrix, int dataType, FILE* filename);
 
 Matrix* inputMatrix(int m, int n, int dataType);
-
-Matrix* generateRandomMatrix(int dataType);
 
 void freeMatrix(Matrix* matrix);
 
