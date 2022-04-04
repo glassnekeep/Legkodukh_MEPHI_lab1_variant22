@@ -205,6 +205,9 @@ errorSafeReturnMatrix* addLinearCombinationOfColumns(Matrix* matrix, const doubl
         memcpy(*((char**)(matrix -> array) + i) + column * size, sum, size);
         free(sum);
     }
+    returnValue -> error = OK;
+    returnValue -> value = matrix;
+    return returnValue;
 }
 
 void printMatrix(Matrix* matrix, int dataType) {

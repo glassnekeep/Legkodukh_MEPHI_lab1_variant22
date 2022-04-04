@@ -272,7 +272,7 @@ int main() {
                 }
                 setbuf(stdout, 0);
                 printf("");
-                int index;
+                //int index;
                 setbuf(stdout, 0);
                 printf("1. Sum two matrices\n2. Multiply two matrices\n3. Transpose the matrix\n4. Add linear combination of lines\n5. Add linear combination of columns\n");
                 while (scanf("%d", &choice1) != 1 || ((int) choice1 > 5) || (int) choice1 < 1) {
@@ -282,7 +282,7 @@ int main() {
                 }
                 setbuf(stdout, 0);
                 printf("current matrix is %d X %d\n", matrix -> m, matrix -> n);
-                errorSafeReturnMatrix* result = malloc(sizeof(errorSafeReturnMatrix));
+                errorSafeReturnMatrix* result;
                 switch (choice1) {
                     case 1:
                         Matrix* sumMatrix = inputMatrix(matrix -> m, matrix -> n, dataType);
@@ -313,6 +313,7 @@ int main() {
                         break;
                     case 4:
                         int line = 0;
+                        printf("Print number of line you would like to add the linear combination to\n");
                         while (scanf("%d", &line) != 1 || line < 0) {
                             setbuf(stdout, 0);
                             printf("Error. Enter correct number\n");
@@ -324,6 +325,7 @@ int main() {
                         break;
                     case 5:
                         int column = 0;
+                        printf("Print number of column you would like to add the linear combination to\n");
                         while (scanf("%d", &column) != 1 || column < 0) {
                             setbuf(stdout, 0);
                             printf("Error. Enter correct column\n");
